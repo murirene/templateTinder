@@ -26,6 +26,9 @@ export function fetchTime(page=1) {
                 debugger;
               return response.json()
             })
-            .then(message => dispatch(receivedTime(message.message)))
+            .then(message => {
+                debugger;
+                dispatch(receivedTime(message[0].message))
+            })
     }
 }

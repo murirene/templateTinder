@@ -7,7 +7,12 @@ router.use(function timeLog(req, res, next){
 });
 
 router.get('/about', function(req, res) {
-    res.json({ message: 'About birds' });
+    var db = req.db;
+    var collection = db.get('usercollection');
+    collection.find({},{},function(e,docs){
+        console.log(JSON.stringify(docs));
+        res.json(docs);
+    });
 })
 
 module.exports = router;
