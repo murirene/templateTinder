@@ -57,25 +57,30 @@ router.post('/:id/issues', (req, res) => {
 /* Create a comment to an issues for a Repo */
 router.post('/:id/issues/:issueId/comments', (req, res) => {
     let repos = req.db.get('repos');
-    let repo = repos.find({ _id: req.params.id });
-    let comment = req.body;
-    let index = _.findIndex(repo.issues, (o) => {return o._id === req.params.issueId});
+    repos.find({ _id: req.params.id }, (err, doc) => {
+        let repo = doc[0];
+        let comment = req.body;
+        let index = _.findIndex(repo.issues, (o) => {
+            return `${o._id}` === req.params.issueId
+        });
 
-    if(index === -1){
-        return res.send(409, `Failed to add comment, issue ${req.params.issueId} not found for repo ${req.params.id}`);
-    }
-
-    repo.issues[index].comments = !repo.issues && !repo.issues[index].comments? [comment]: [...repo.issues[index].comments, comment];
-
-    repos.update({ _id: req.params.id }, {$set: {issues: repo.issues}}, {$currentDate: { lastModified: true }},
-        (err, doc) => {
-            if(err){
-                return res.send(409, `Failed to add comment to issue ${req.params.issueId} for repo ${req.params.id}`);
-            }
-
-            res.json({ records: doc });
+        if(index === -1){
+            return res.send(409, `Failed to add comment, issue ${req.params.issueId} not found for repo ${req.params.id}`);
         }
-    );
+
+        repo.issues[index].comments = !repo.issues && !repo.issues[index].comments? [comment]: [...repo.issues[index].comments, comment];
+
+        repos.update({ _id: req.params.id }, {$set: {issues: repo.issues}}, {$currentDate: { lastModified: true }},
+            (err, doc) => {
+                if(err){
+                    return res.send(409, `Failed to add comment to issue ${req.params.issueId} for repo ${req.params.id}`);
+                }
+
+                res.json({ records: doc });
+            }
+        );
+
+    });
 })
 
 /* Retrieve the of issues for a Repo */
@@ -90,7 +95,6 @@ router.get('/:id/issues', (req, res) => {
         }
     );
 })
-
 
 router.get('/about', (req, res) => {
     let collection = req.db.get('usercollection');
