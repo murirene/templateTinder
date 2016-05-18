@@ -1,27 +1,33 @@
 'use strict';
-import express from 'express';
-import router from './routes';
+
+let express = require('express');
+let router = require('./router/routes');
+let bodyParser = require("body-parser");
+
 let app = express();
 
 app.use(express.static('build'));
 app.use(express.static('src/public'));
 
 
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/tinder');
+let mongo = require('mongodb');
+let monk = require('monk');
+let db = monk('localhost:27017/tinder');
+
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Make our db accessible to our router
-app.use(function(req,res,next){
+app.use( (req,res, next) => {
     req.db = db;
     next();
 });
 
-app.use('/birds', router);
+app.use('/repos', router);
 
 const PORT = 3000;
+
 let f = () => {
     console.log(`Listening to ${PORT}`);
 }
 
-app.listen(3000, f);
+app.listen(PORT, f);
