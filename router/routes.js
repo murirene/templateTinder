@@ -86,7 +86,7 @@ router.post('/:id/issues/:issueId/comments', (req, res) => {
 /* Retrieve the of issues for a Repo */
 router.get('/:id/issues', (req, res) => {
     let repos = req.db.get('repos');
-    let repo = repos.find({ _id: req.params.id }, (err, doc) => {
+    repos.find({ _id: req.params.id }, (err, doc) => {
             if(err){
                 return res.send(409, `Failed to retrieve issues for repo ${req.params.id}`);
             }
@@ -96,12 +96,22 @@ router.get('/:id/issues', (req, res) => {
     );
 })
 
-router.get('/about', (req, res) => {
-    let collection = req.db.get('usercollection');
+/* Retrieve the comments for an issue */
+/*router.get('/:id/issues/:issueId/comments', (req, res) => {
+    let repos = req.db.get('repos');
+    repos.find({ _id: req.params.id }, (err, doc) => {
+        let repo = doc[0];
+        let index = _.findIndex(repo.issues, (o) => {
+            return `${o._id}` === req.params.issueId
+        });
 
-    collection.find({},{}, (e,docs) => {
-        res.json(docs);
+        if(index === -1){
+            return res.send(409, `Failed to add comment, issue ${req.params.issueId} not found for repo ${req.params.id}`);
+        }
+
+        res.json(comments: repo.issues.comments);
+
     });
-})
+})*/
 
 module.exports = router;
